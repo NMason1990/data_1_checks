@@ -20,24 +20,32 @@ hash_value = hashlib.sha512(hash_string.encode()).hexdigest()
 # Construct the URL with the query string and hash
 url = f'https://api.fabdb.net/cards?{query_string}&hash={hash_value}'
 
+parameters = {
+    "page":1,
+    "per_page":100
+
+} 
+
+total_pages = 21
 # Set the request headers
 headers = {
     'Authorization': f'Bearer {token}',
     'Accept': 'application/json'
 }
 
-# Send the GET request
-response = requests.get(url, headers=headers)
+data_records = []
 
-# Check the response status code
-print(f'Response status code: {response.status_code}')
+for page in range(1, total_pages + 1):
+    parameters['page'] = page
 
-# Convert response to JSON
-data = response.json()
+    response = requests.get(url, params=parameters)
 
-# Extract the 'data' field from the response dictionary
-data_records = data['data']
+    # Process the response or store the data as per your requirement
+    data = response.json()
 
+    # Extract the relevant data records from the response
+    data_records.extend(data['data'])
+  
 # Create a DataFrame from the extracted data records
 df = pd.DataFrame(data_records)
 
